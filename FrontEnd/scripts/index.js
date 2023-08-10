@@ -49,8 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         })
 
+    // Récupération des catégories depuis l'api
+     
     fetch('http://localhost:5678/api/categories')
         .then(response => response.json())
+        
+        // Création des boutons pour le filtrage des catégories
+
         .then(categories => {
             const CategoriesSet = new Set(categories.map(category => category.name));
             const CategoriesArray = Array.from(CategoriesSet);
@@ -64,6 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.textContent = category;
                 filterButtonsContainer.appendChild(button);
             });
+
+            // Filtrage des catégories 
 
             const filterButtons = document.querySelectorAll('#filter-buttons button');
             filterButtons.forEach(button => {

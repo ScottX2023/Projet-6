@@ -210,3 +210,51 @@ footer nav ul {
 	background-color: #1D6154;
 	color: white;
 }
+
+/* Style page de login */
+
+.login_title {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding-bottom: 20px;
+	color: #1D6154;
+}
+
+.login-form {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-bottom: 15px;
+}
+
+.login-input {
+	padding: 5px;
+	margin-top: 10px;
+	background: #FFF;
+	box-shadow: 0px 4px 14px 0px rgba(0, 0, 0, 0.09);
+	border: none;
+	width: 250px;
+}
+
+.button-login {
+	border-radius: 60px;
+	background: #1D6154;
+	border: none;
+	padding: 10px;
+	color: #FFF;
+	width: 150px;
+}
+
+.button-login:hover,
+.button-login:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+}
