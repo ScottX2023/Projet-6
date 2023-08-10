@@ -186,3 +186,27 @@ footer nav ul {
 	margin: 2em
 }
 
+/* Style boutons catégories */
+
+#filter-buttons {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#filter-buttons button {
+	padding: 10px 20px;
+	font-size: 16px;
+	color: #1D6154;
+	background-color: white;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	cursor: pointer;
+}
+
+#filter-buttons button:hover {
+	background-color: #1D6154;
+	color: white;
+}
