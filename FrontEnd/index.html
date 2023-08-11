@@ -7,26 +7,40 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
 	<script src="scripts/index.js"></script>
-<header>
-	<h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
-	<nav>
-		<ul>
-			<li>projets</li>
-			<li>contact</li>
-			<li>login</li>
-			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
-		</ul>
-	</nav>
+<header class="header-container">
+	<div id="banner-modifier" class="hidden">
+		<div class="mode-édition">
+			<i class="fas fa-pen-to-square"></i>
+			<span>Mode édition</span>
+		</div>
+		<button class="publish-modifications">publier les changements</button>
+	</div>
+	<div class="header-h1-nav">
+		<h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+			<nav>
+				<ul>
+					<li>projets</li>
+					<li>contact</li>
+					<li>login</li>
+					<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
+				</ul>
+			</nav>
+	</div>
 </header>
 <main>
 	<section id="introduction">
 		<figure>
 			<img src="./assets/images/sophie-bluel.png" alt="">
+			<div id="edit-image-container" class="image-container hidden">
+				<i class="fas fa-pen-to-square"></i>
+				<span>modifier</span>
+			</div>
 		</figure>
 		<article>
 			<h2>Designer d'espace</h2>
@@ -36,7 +50,13 @@
 		</article>
 	</section>
 	<section id="portfolio">
-		<h2>Mes Projets</h2>
+		<div class="edit-project-container">
+			<h2>Mes Projets</h2>
+			<div id="edit-gallery-container" class="hidden">
+				<i class="fas fa-pen-to-square"></i>
+				<span>modifier</span>
+			</div>
+		</div>
 		<div id="filter-buttons">
 		</div>
 		<div class="gallery" id="gallery-container">

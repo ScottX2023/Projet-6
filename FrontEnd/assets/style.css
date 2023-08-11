@@ -258,3 +258,64 @@ footer nav ul {
 	text-decoration: none;
 	cursor: pointer;
 }
+
+/* Style edit tools */
+
+.header-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.header-h1-nav {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+#banner-modifier {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	background-color: #000;
+	height: 60px;
+	margin-bottom: 30px;
+	margin-left: -150px; 
+	margin-right: -150px;
+	margin-top: -50px;
+}
+
+.publish-modifications {
+	border-radius: 60px;
+	background-color: #FFF;
+	color: #000;
+	border: none;
+	padding: 10px;
+}
+
+.mode-édition {
+	color: #fff;
+	margin-right: 10px;
+}
+
+
+.image-container {
+	display: flex;
+	margin-left: 57px;
+	margin-top: 20px;
+}
+
+.edit-project-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#edit-gallery-container {
+	margin-bottom: 30px;
+	margin-left: 20px;
+}
+
+.hidden {
+	display: none !important;
+}

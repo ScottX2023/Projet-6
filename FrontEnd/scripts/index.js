@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(worksData => {
             data = worksData;
             displayProjects(data);
-
+            updateLogginButton();
         })
 
     // Récupération des catégories depuis l'api
@@ -84,25 +84,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             });
-
-
-
-
-
-
         })
 
 
+  // Modification du bouton de connexion en fonction de l'état de connexion
 
+  function updateLogginButton() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const loginButton = document.querySelector('nav ul li:nth-child(3)');
+  
+    if (isLoggedIn === 'true') {
+      loginButton.textContent = 'logout';
+      loginButton.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('isLoggedIn');
+        loginButton.textContent = 'login';
+        window.location.href = './login.html';
+      });
+      toggleLoggedInElements(true); 
+    } else {
+      loginButton.textContent = 'login';
+      loginButton.addEventListener('click', () => {
+        window.location.href = './login.html';
+      });
+      toggleLoggedInElements(false);
+    }
+  }
+  
+  updateLogginButton();
 
+  // Affichage des éléments de modification si l'utilisateur est connecté
 
-
-
-
-
-
-
-
+  function toggleLoggedInElements(isLoggedIn){
+    const bannerModifier = document.getElementById('banner-modifier')
+    const editImageContainer = document.getElementById('edit-image-container')
+    const editGalleryContainer = document.getElementById('edit-gallery-container')
+    
+    if(isLoggedIn){
+      bannerModifier.classList.remove('hidden')
+      editGalleryContainer.classList.remove('hidden')
+      editImageContainer.classList.remove('hidden')
+    } else {
+      bannerModifier.classList.add('hidden')
+      editGalleryContainer.classList.add('hidden')
+      editImageContainer.classList.add('hidden')
+    }
+  }
 
 
 
