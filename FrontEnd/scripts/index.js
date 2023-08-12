@@ -47,6 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
             data = worksData;
             displayProjects(data);
             updateLogginButton();
+
+            let galleryHTML = '';
+            data.forEach(project => {
+              galleryHTML += '<div class="project">';
+              galleryHTML += '  <div class="project-container">';
+              galleryHTML += '    <img class="modal-project-image" src="' + project.imageUrl + '" alt="' + project.title + '">';
+              galleryHTML += '    <i class="fas fa-arrows-up-down-left-right"></i>';
+              galleryHTML += '    <i class="fas fa-trash-can" data-id="' + project.id + '"></i>';
+              galleryHTML += '  </div>';
+              galleryHTML += '  <p>Éditer</p>';
+              galleryHTML += '</div>';
+            });
+            galleryModal.innerHTML = galleryHTML;
         })
 
     // Récupération des catégories depuis l'api
@@ -131,7 +144,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Ouverture et fermeture des deux modales
 
+  const galleryModal = document.getElementById('gallery-modal');
+  const editGalleryContainer = document.getElementById('edit-gallery-container');
+  const modalContainer = document.getElementById('first-modal');
+  const modalOverlay = document.getElementById('modal-overlay');
+  const closeFirstModal = document.getElementById('first-modal-close-btn');
+  const openSecondModal = document.getElementById('second-modal');
+  const addImageBtn = document.getElementById('add-image-btn');
+  const arrowLeft = document.getElementById('arrow-left-icon');
+  const closeSecondModal = document.getElementById('second-modal-close-btn');
+
+  editGalleryContainer.addEventListener('click', () => {
+    modalContainer.classList.remove('hidden');
+    modalOverlay.classList.remove('hidden');
+  });
+  
+  closeFirstModal.addEventListener('click', () => {
+    modalContainer.classList.add('hidden');
+    modalOverlay.classList.add('hidden');
+  });
+
+  modalOverlay.addEventListener('click', (event) => {
+    modalContainer.classList.add('hidden');
+    modalOverlay.classList.add('hidden');
+    openSecondModal.classList.add('hidden');
+  });
+  
+  addImageBtn.addEventListener('click', () => {
+    modalContainer.classList.add('hidden')
+    openSecondModal.classList.remove('hidden')
+  });
+
+  arrowLeft.addEventListener('click', () => {
+    openSecondModal.classList.add('hidden')
+    modalContainer.classList.remove('hidden')
+  })
+
+  closeSecondModal.addEventListener('click', () => {
+    openSecondModal.classList.add('hidden')
+    modalOverlay.classList.add('hidden')
+  })
 
 
 
