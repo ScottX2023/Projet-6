@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Création des boutons pour le filtrage des catégories
 
     .then(categories => {
+      console.log(categories)
       const CategoriesSet = new Set(categories.map(category => category.name));
       const CategoriesArray = Array.from(CategoriesSet);
       const filterButtonsContainer = document.getElementById('filter-buttons')
@@ -107,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const filterButtons = document.querySelectorAll('#filter-buttons button');
       filterButtons.forEach(button => {
         button.addEventListener('click', () => {
-          console.log('click')
           const selectedCategory = button.textContent;
           if (selectedCategory === 'Tous') {
             displayProjects(data);
@@ -116,9 +116,21 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       });
+
+      // Récuperation des catégories pour le menu select
+
+      const selectCategory = document.getElementById('category');
+      let optionsHTML = '';
+      categories.forEach(category => {
+        optionsHTML += `<option value="${category.id}">${category.name}</option>`;
+      });
+      selectCategory.innerHTML = optionsHTML;
+
     })
-
-
+    .catch(error => {
+      console.error('Error fetching categories:', error);
+    });
+    
   // Modification du bouton de connexion en fonction de l'état de connexion
 
   function updateLogginButton() {
@@ -209,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Suppréssion d'un projet en fonction de son id 
 
   let token = localStorage.getItem('token');
+  console.log('token', token)
 
   function deleteProject(workId) {
     console.log('Deleting project with ID:', workId);
@@ -267,5 +280,105 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   } 
+
+  // Affichage d'un preview de l'image a ajouter 
+
+  function displayImage() {
+    const imageInput = document.getElementById('image');
+    const icon = document.querySelector('.new-project-image i');
+    const label = document.querySelector('.new-project-image label');
+    const paragraph = document.querySelector('.new-project-image p');
+    const selectedImage = document.getElementById('selectedImage');
+  
+    if (imageInput.files.length === 0) {
+      icon.classList.remove('hidden');
+      label.classList.remove('hidden');
+      paragraph.classList.remove('hidden');
+      selectedImage.style.display = 'none';
+    } else {
+      icon.classList.add('hidden');
+      label.classList.add('hidden');
+      paragraph.classList.add('hidden');
+      const selectedFile = imageInput.files[0];
+      const imageUrl = URL.createObjectURL(selectedFile);
+      selectedImage.src = imageUrl;
+      selectedImage.style.display = 'block';
+    }
+  }
+
+  const imageInput = document.getElementById('image');
+  imageInput.addEventListener('change', displayImage);
+
+  // Verification du remplissage des inputs pour activer le bouton d'envoi
+
+  function completeForm(){
+    const imageInput = document.getElementById('image');
+    const titleInput = document.getElementById('title');
+    const categoryInput = document.getElementById('category');
+
+    console.log('Image File:', imageInput.files[0]);
+    console.log('Title:', titleInput.value);
+    console.log('Category:', categoryInput.value);
+
+    return imageInput.files[0] && titleInput.value && categoryInput.value;
+  }
+
+  const activeSubmitBtn = document.getElementById('submitBtn');
+  function enableSubmitBtn(){
+    activeSubmitBtn.disabled = !completeForm();
+  }
+
+  const newProjectForm = document.getElementById('new-project-form');
+  newProjectForm.addEventListener('input', () => {
+    enableSubmitBtn();
+  });
+
+  newProjectForm.addEventListener('submit', (event) => {
+    addNewProject(event, token);
+  });
+
+  // Ajout d'un nouveau projet 
+
+  function addNewProject(event) {
+    event.preventDefault();
+    const title = document.getElementById('title').value;
+    const categoryId = document.getElementById('category').value;
+    const imageInput = document.getElementById('image');
+    const imageFile = imageInput.files[0];
+  
+    console.log('Title:', title);
+    console.log('Selected Category ID:', categoryId);
+    console.log('Image File:', imageFile);
+  
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('image', imageFile, imageFile.name);
+    formData.append('category', categoryId);
+  
+    console.log(formData);
+  
+    fetch('http://localhost:5678/api/works', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error('Failed to add new project');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('New project added successfully:', data);
+    })
+    .catch(error => {
+      console.error('Error adding new project:', error);
+    });
+  }
+  
+  
 
 })
