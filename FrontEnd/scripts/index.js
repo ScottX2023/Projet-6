@@ -40,6 +40,41 @@ document.addEventListener('DOMContentLoaded', () => {
     displayProjects(data, category);
   }
 
+  // Création des projets dynamiquement
+
+  function createProjectElement(project) {
+    const projectElement = document.createElement('div');
+    projectElement.classList.add('project');
+  
+    const projectContainer = document.createElement('div');
+    projectContainer.classList.add('project-container');
+  
+    const img = document.createElement('img');
+    img.classList.add('modal-project-image');
+    img.src = project.imageUrl;
+    img.alt = project.title;
+    img.dataset.id = project.id;
+  
+    const arrowsIcon = document.createElement('i');
+    arrowsIcon.classList.add('fas', 'fa-arrows-up-down-left-right');
+  
+    const trashIcon = document.createElement('i');
+    trashIcon.classList.add('fas', 'fa-trash-can');
+  
+    projectContainer.appendChild(img);
+    projectContainer.appendChild(arrowsIcon);
+    projectContainer.appendChild(trashIcon);
+  
+    const editParagraph = document.createElement('p');
+    editParagraph.textContent = 'Éditer';
+  
+    projectElement.appendChild(projectContainer);
+    projectElement.appendChild(editParagraph);
+  
+    return projectElement;
+  }
+
+  // Récupération des projets depuis l'api
 
   fetch('http://localhost:5678/api/works')
     .then(response => response.json())
@@ -48,32 +83,31 @@ document.addEventListener('DOMContentLoaded', () => {
       displayProjects(data);
       updateLogginButton();
 
-      let galleryHTML = '';
+      const galleryModal = document.getElementById('gallery-modal');
       data.forEach(project => {
-        galleryHTML += '<div class="project">';
-        galleryHTML += '  <div class="project-container">';
-        galleryHTML += '    <img class="modal-project-image" src="' + project.imageUrl + '" alt="' + project.title + '" data-id="' + project.id + '">';
-        galleryHTML += '    <i class="fas fa-arrows-up-down-left-right"></i>';
-        galleryHTML += '    <i class="fas fa-trash-can"></i>';
-        galleryHTML += '  </div>';
-        galleryHTML += '  <p>Éditer</p>';
-        galleryHTML += '</div>';
+        const projectElement = createProjectElement(project);
+        galleryModal.appendChild(projectElement);
       });
-      galleryModal.innerHTML = galleryHTML;
 
       // Suppression des projets au click sur l'icone 
 
-      const trashIcons = document.querySelectorAll('.fas.fa-trash-can');
-      trashIcons.forEach(icon => {
-        icon.addEventListener('click', (event) => {
-          const projectContainer = event.target.closest('.project-container');
-          const workId = projectContainer.querySelector('.modal-project-image').dataset.id;
+      function attachTrashIcons(){ 
+        const galleryModal = document.getElementById('gallery-modal');
 
-          if (confirm("Voulez vous supprimer ce projet")) {
-            deleteProject(workId);
+        galleryModal.addEventListener('click', (event) => {
+          const trashIcon = event.target.closest('.fas.fa-trash-can');
+          if (trashIcon) {
+            const projectContainer = trashIcon.closest('.project-container');
+            const workId = projectContainer.querySelector('.modal-project-image').dataset.id;
+    
+            if (confirm("Voulez vous supprimer ce projet")) {
+              deleteProject(workId);
+            }
           }
         });
-      });
+      }
+
+      attachTrashIcons();
     })
 
   // Récupération des catégories depuis l'api
@@ -130,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => {
       console.error('Error fetching categories:', error);
     });
-    
+
   // Modification du bouton de connexion en fonction de l'état de connexion
 
   function updateLogginButton() {
@@ -143,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('token');
         localStorage.removeItem('isLoggedIn');
         loginButton.textContent = 'login';
-        window.location.href = './login.html';
+        window.location.href = './index.html';
       });
       toggleLoggedInElements(true);
     } else {
@@ -163,12 +197,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const bannerModifier = document.getElementById('banner-modifier')
     const editImageContainer = document.getElementById('edit-image-container')
     const editGalleryContainer = document.getElementById('edit-gallery-container')
+    const filterBtns = document.getElementById('filter-buttons')
 
     if (isLoggedIn) {
+      filterBtns.classList.add('hidden')
       bannerModifier.classList.remove('hidden')
       editGalleryContainer.classList.remove('hidden')
       editImageContainer.classList.remove('hidden')
     } else {
+      filterBtns.classList.remove('hidden')
       bannerModifier.classList.add('hidden')
       editGalleryContainer.classList.add('hidden')
       editImageContainer.classList.add('hidden')
@@ -232,54 +269,32 @@ document.addEventListener('DOMContentLoaded', () => {
       },
     })
       .then(response => {
-        console.log('Delete response:', response);
-
         if (!response.ok) {
           throw new Error('Échec suppression');
         }
 
         if (response.status === 204) {
           console.log('Project deleted successfully');
+
+          const projectElementToDelete = document.querySelector(`[data-id="${workId}"]`);
+          if (projectElementToDelete) {
+            projectElementToDelete.closest('.project').remove();
+          }
+
           fetch('http://localhost:5678/api/works')
             .then(response => response.json())
-            .then(worksData => {
-              data = worksData;
-              displayProjects(data);
-              let galleryHTML = '';
-              data.forEach(project => {
-                galleryHTML += '<div class="project">';
-                galleryHTML += '  <div class="project-container">';
-                galleryHTML += '    <img class="modal-project-image" src="' + project.imageUrl + '" alt="' + project.title + '" data-id="' + project.id + '">';
-                galleryHTML += '    <i class="fas fa-arrows-up-down-left-right"></i>';
-                galleryHTML += '    <i class="fas fa-trash-can"></i>';
-                galleryHTML += '  </div>';
-                galleryHTML += '  <p>Éditer</p>';
-                galleryHTML += '</div>';
-              });
-              galleryModal.innerHTML = galleryHTML;
-              attachTrashIcon();
+            .then(updatedData => {
+              displayProjects(updatedData); 
             })
-            .catch(error => console.error('Error refreshing gallery:', error));
+            .catch(error => console.error('Error fetching updated data:', error));
+
+      
         } else {
           return response.json();
         }
       })
       .catch(error => console.error('Delete error:', error));
   }
-
-  function attachTrashIcon() {
-    const trashIcons = document.querySelectorAll('.fas.fa-trash-can');
-    trashIcons.forEach(icon => {
-      icon.addEventListener('click', (event) => {
-        const projectContainer = event.target.closest('.project-container');
-        const workId = projectContainer.querySelector('.modal-project-image').dataset.id;
-  
-        if (confirm("Voulez vous supprimer ce projet")) {
-          deleteProject(workId);
-        }
-      });
-    });
-  } 
 
   // Affichage d'un preview de l'image a ajouter 
 
@@ -289,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const label = document.querySelector('.new-project-image label');
     const paragraph = document.querySelector('.new-project-image p');
     const selectedImage = document.getElementById('selectedImage');
-  
+
     if (imageInput.files.length === 0) {
       icon.classList.remove('hidden');
       label.classList.remove('hidden');
@@ -306,25 +321,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Réinitialise l'input afin d'ajouter une nouvelle image 
+
+  function resetImageSelection() {
+    const icon = document.querySelector('.new-project-image i');
+    const label = document.querySelector('.new-project-image label');
+    const paragraph = document.querySelector('.new-project-image p');
+    const selectedImage = document.getElementById('selectedImage');
+    imageInput.value = '';
+    icon.classList.remove('hidden');
+    label.classList.remove('hidden');
+    paragraph.classList.remove('hidden');
+    selectedImage.style.display = 'none';
+  }
+
+  const removeSelectedImage = document.querySelector('.new-project-image');
+  removeSelectedImage.addEventListener('click', resetImageSelection);
+
   const imageInput = document.getElementById('image');
   imageInput.addEventListener('change', displayImage);
 
   // Verification du remplissage des inputs pour activer le bouton d'envoi
 
-  function completeForm(){
+  function completeForm() {
     const imageInput = document.getElementById('image');
     const titleInput = document.getElementById('title');
     const categoryInput = document.getElementById('category');
-
-    console.log('Image File:', imageInput.files[0]);
-    console.log('Title:', titleInput.value);
-    console.log('Category:', categoryInput.value);
 
     return imageInput.files[0] && titleInput.value && categoryInput.value;
   }
 
   const activeSubmitBtn = document.getElementById('submitBtn');
-  function enableSubmitBtn(){
+  function enableSubmitBtn() {
     activeSubmitBtn.disabled = !completeForm();
   }
 
@@ -345,18 +373,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryId = document.getElementById('category').value;
     const imageInput = document.getElementById('image');
     const imageFile = imageInput.files[0];
-  
-    console.log('Title:', title);
-    console.log('Selected Category ID:', categoryId);
-    console.log('Image File:', imageFile);
-  
+
     const formData = new FormData();
     formData.append('title', title);
     formData.append('image', imageFile, imageFile.name);
     formData.append('category', categoryId);
-  
-    console.log(formData);
-  
+
     fetch('http://localhost:5678/api/works', {
       method: 'POST',
       headers: {
@@ -364,21 +386,44 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       body: formData,
     })
-    .then(response => {
-      console.log('Response status:', response.status);
-      if (!response.ok) {
-        throw new Error('Failed to add new project');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('New project added successfully:', data);
-    })
-    .catch(error => {
-      console.error('Error adding new project:', error);
-    });
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+          throw new Error('Failed to add new project');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('New project added successfully:', data);
+        const galleryContainer = document.getElementById('gallery-container');
+        const figure = document.createElement('figure');
+        const img = document.createElement('img');
+        img.src = data.imageUrl; 
+        img.alt = data.title; 
+        const figcaption = document.createElement('figcaption');
+        figcaption.textContent = data.title; 
+      
+  
+        figure.appendChild(img);
+        figure.appendChild(figcaption);
+        galleryContainer.appendChild(figure);
+
+        const newProjectElement = createProjectElement(data);
+
+        const galleryModal = document.getElementById('gallery-modal');
+        galleryModal.appendChild(newProjectElement);
+
+        const modalContainer = document.getElementById('first-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        modalContainer.classList.remove('hidden');
+        modalOverlay.classList.remove('hidden');
+        openSecondModal.classList.add('hidden');
+      })
+      .catch(error => {
+        console.error('Error adding new project:', error);
+      });
   }
-  
-  
+
+
 
 })
