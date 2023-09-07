@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const loginForm = document.getElementById('login-form');
+    const errorContainer = document.createElement('div');
+    loginForm.appendChild(errorContainer);
     
     // Envoi des identifiants de connexion
 
@@ -13,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
   
       console.log('userData:', userData);
+      errorContainer.innerHTML = '';
   
       fetch('http://localhost:5678/api/users/login', {
         method: 'POST',
@@ -39,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error(error);
           const errorMessage = document.createElement('p');
           errorMessage.textContent = 'Invalid username or password';
-          loginForm.appendChild(errorMessage);
+          errorContainer.appendChild(errorMessage);
         });
     });
   });
